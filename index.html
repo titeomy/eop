@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eop</title>
+    <link rel="icon" href="/icon.png" type="image/png" sizes="16x16">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        h1
+{
+   
+  background-image: linear-gradient(
+    -225deg,
+    #231557 0%,
+    #44107a 29%,
+    #ff1361 67%,
+    #fff800 100%
+  );
+  background-size: auto auto;
+  background-clip: border-box;
+  background-size: 200% auto;
+  color: #fff;
+  background-clip: text;
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textclip 2s linear infinite;
+  display: inline-block;
+      font-size: 190px;
+}
+
+@keyframes textclip {
+  to {
+    background-position: 200% center;
+  }
+}
+.container {
+    display: grid;
+    grid-template-rows: repeat(3, 1fr); /* Chia thành 3 hàng bằng nhau */
+            grid-gap: 0px;
+    flex-direction: column;
+  position: relative;
+  width: 350px;
+  height: 250px;
+  text-align: center;
+  border-radius: 20px;
+  padding:20px 40px;
+  box-sizing: border-box;
+  background: #ecf0f3;
+  box-shadow: 14px 14px 20px #cbced1, -14px -14px 20px white;
+  align-items: center; /* Căn giữa theo chiều ngang */
+justify-content: center;
+}
+        h1 {
+            font-size: 30px;
+            color: #42ff31;
+        }
+        
+        textarea {
+            width: 90%;
+            height: 100px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 16px;
+            resize: none;
+            background-color: #fff;
+            color: #333;
+            border-radius: 10px;
+        }
+       
+        button {
+  padding: 1.3em 3em;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  font-weight: 550;
+  color: #000;
+  background-color: #ecf0f3;
+  border: none;
+  border-radius: 45px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease 0s;
+  cursor: pointer;
+  outline: none;
+  margin-bottom: 20px;
+  margin-left: 10px;
+}
+
+button:hover {
+  background-color: #23c483;
+  box-shadow: 0px 15px 20px rgba(46, 229, 157, 0.4);
+  color: #fff;
+  transform: translateY(-7px);
+}
+
+button:active {
+  transform: translateY(-1px);
+}
+.loader {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  border: 3px solid;
+  border-color: #ce1a9b #760c51 transparent transparent;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+  margin: 0 auto;
+}
+.loader::after,
+.loader::before {
+  content: '';  
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  border: 3px solid;
+  border-color: transparent transparent #FF3D00 #c67a63;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  animation: rotationBack 0.5s linear infinite;
+  transform-origin: center center;
+}
+.loader::before {
+  width: 32px;
+  height: 32px;
+  border-color: #FFF #FFF transparent transparent;
+  animation: rotation 1.5s linear infinite;
+}
+    
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+} 
+@keyframes rotationBack {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+    
+input {
+  background: #ecf0f3;
+  padding: 10px;
+  padding:10px 15px;
+  height: 50px;
+  font-size: 16px;
+  border-radius: 50px;
+  box-shadow: inset 6px 6px 6px #cbced1, inset -6px -6px 6px white;
+  display: block;
+  width: 300px;
+  border: none;
+  outline: none;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>answers</h1>
+        <input id="imageUrlInput" type="text" placeholder="URL" style="display: none;"></input>
+        <p id="s" class="loader" style="display: none;"></p>
+        <button class="pasteButton" onclick="pasteClipboard()" id="tam" style="padding-left: 0px; padding-right: 0px; width: 220px; margin: auto;">Paste & Convert </button>
+        <button id="submitButton" style="display: none;">Convert</button>
+        <button id="copyButton" onclick="copyText()" style="display: block; margin: auto;">Copy JS</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js"></script>
+    <script>
+        const imageUrlInput = document.getElementById('imageUrlInput');
+        const submitButton = document.getElementById('submitButton');
+        const copyButton = document.getElementById('copyButton');
+        const pasteButton = document.getElementsByClassName('pasteButton');
+        const resultDiv = document.getElementById('result');
+        let isRecognitionComplete = false;
+        let clipboardText = '';
+
+        submitButton.addEventListener('click', () => {
+            const inputText = imageUrlInput.value;
+            try {
+                const imageUrlList = JSON.parse(inputText);
+                s.style.display='block';
+                tam.style.display='none';
+                if (Array.isArray(imageUrlList) && imageUrlList.length > 0) {
+                    recognizeImages(imageUrlList);
+                } else {
+                    alert('Mảng URL trống hoặc không hợp lệ.');
+                }
+            } catch (error) {
+                alert('Định dạng đầu vào không hợp lệ.');
+                imageUrlInput.value = '';
+            }
+        });
+
+        async function recognizeImages(imageUrlList) {
+            const results = [];
+
+            for (const imageUrl of imageUrlList) {
+                const { data: { text } } = await Tesseract.recognize(
+                    imageUrl,
+                    'eng',
+                    { logger: (m) => console.log(m) }
+                );
+
+                results.push(text);
+            }
+
+            isRecognitionComplete = true;
+            copyButton.style.backgroundColor = '#dec8ff';
+            copyButton.addEventListener('mouseenter', () => {
+                    copyButton.style.backgroundColor = '#23c483'; 
+                    
+});
+copyButton.addEventListener('mouseleave', () => {
+    copyButton.style.backgroundColor = '#dec8ff'; 
+});
+            s.style.display='none';
+                    tam.style.display='block';
+            clipboardText = `var wordsToFill = ${JSON.stringify(results)};
+var inputElements = document.getElementsByTagName("input");
+for (var i = 0; i < inputElements.length; i++) {
+  if (i < wordsToFill.length) {
+    inputElements[i].value = wordsToFill[i];
+  }
+}`;
+        }
+
+        function copyText() {
+            if (isRecognitionComplete) {
+                const textToCopy = clipboardText;
+
+                if (textToCopy) {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = textToCopy;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+
+                    imageUrlInput.value = '';
+                    copyButton.style.backgroundColor = '#23c483';
+                    copyButton.style.color = 'f000';
+                    s.style.display='none';
+                    tam.style.display='block';
+                    copyButton.addEventListener('mouseenter', () => {
+                    copyButton.style.backgroundColor = '#23c483'; 
+                    
+});
+
+copyButton.addEventListener('mouseleave', () => {
+    copyButton.style.backgroundColor = '#f000'; 
+});
+                }
+            } else {
+                alert('Vui lòng chờ cho đến khi nhận dạng hoàn thành.');
+            }
+        }
+
+        function pasteClipboard() {
+            navigator.clipboard.readText()
+                .then(text => {
+                    imageUrlInput.value = text;
+                    submitButton.click();
+                    copyButton.style.backgroundColor = '#ecf0f3';
+                })
+                .catch(err => {
+                    console.error('Không thể đọc clipboard:', err);
+                });
+                
+        }
+    </script>
+</body>
+</html>
